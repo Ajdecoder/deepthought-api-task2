@@ -1,11 +1,11 @@
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
-const env = require("dotenv");
+const dotenv = require("dotenv");
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
 
-env.config();
+dotenv.config();
 
 // Configure Cloudinary
 cloudinary.config({
@@ -25,6 +25,7 @@ const storage = new CloudinaryStorage({
   params: {
     folder: "nudges", // folder in your Cloudinary account
     format: async (req, file) => "png", // convert all images to png format
+    public_id: (req, file) => file.filename, // use original file name
   },
 });
 
@@ -34,10 +35,7 @@ const app = express();
 app.use(express.json());
 app.set("view engine", "ejs");
 
-app.get("/", (req, res) => {
-  res.render("home");
-});
-
+// Connect to MongoDB
 async function connectToDatabase() {
   const client = new MongoClient(mongoUrl);
   try {
@@ -50,11 +48,25 @@ async function connectToDatabase() {
   }
 }
 
+// Serve the home page
+app.get("/", (req, res) => {
+  res.render("home");
+});
+
+// Create a new nudge
 app.post("/api/v3/app/nudges", upload.single("coverImage"), async (req, res) => {
   try {
     const db = await connectToDatabase();
 
-    // Cloudinary stores the image and provides a URL
+    // Debugging statements
+    console.log("File:", req.file);
+    console.log("Body:", req.body);
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    // Cloudinary URL for the image
     const coverImageUrl = req.file.path;
 
     const nudge = {
@@ -75,6 +87,18 @@ app.post("/api/v3/app/nudges", upload.single("coverImage"), async (req, res) => 
 
     const result = await db.collection(collectionName).insertOne(nudge);
     res.status(201).json({ id: result.insertedId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Get all nudges
+app.get("/api/v3/app/nudges", async (req, res) => {
+  try {
+    const db = await connectToDatabase();
+    const nudges = await db.collection(collectionName).find({}).toArray();
+    res.json(nudges);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
@@ -109,6 +133,7 @@ app.put("/api/v3/app/nudges/:id", async (req, res) => {
     const existingNudge = await db
       .collection(collectionName)
       .findOne({ _id: new ObjectId(nudgeId) });
+
     if (!existingNudge) {
       return res.status(404).json({ error: "Nudge not found" });
     }
@@ -126,6 +151,7 @@ app.put("/api/v3/app/nudges/:id", async (req, res) => {
           }
         },
         description: req.body.description,
+        icon: req.body.icon,
         invitationText: req.body.invitationText
       }
     };

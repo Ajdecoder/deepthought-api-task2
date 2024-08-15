@@ -1,144 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create Nudge</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input, 
-        .form-group select, 
-        .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .form-group input[type="file"] {
-            padding: 3px;
-        }
-        .form-group .icon-picker {
-            display: inline-block;
-            width: auto;
-            padding: 8px;
-            margin-right: 10px;
-            cursor: pointer;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f7f7f7;
-        }
-        .form-group .icon-picker:after {
-            content: "Choose icon";
-        }
-        .form-group button {
-            width: 48%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .form-group .btn-preview {
-            background-color: #6c757d;
-            color: white;
-            margin-right: 4%;
-        }
-        .form-group .btn-publish {
-            background-color: #28a745;
-            color: white;
-        }
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .form-group input[type="file"] {
+        padding: 3px;
+      }
+      .form-group .icon-picker {
+        display: inline-block;
+        width: auto;
+        padding: 8px;
+        margin-right: 10px;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f7f7f7;
+      }
+      .form-group .icon-picker:after {
+        content: "Choose icon";
+      }
+      .form-group button {
+        width: 48%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .form-group .btn-preview {
+        background-color: #6c757d;
+        color: white;
+        margin-right: 4%;
+      }
+      .form-group .btn-publish {
+        background-color: #28a745;
+        color: white;
+      }
+      .view-nudge {
+        position: relative;
+        display: inline;    
+        padding: 30px;
+        border-radius: 60px;
+        cursor: pointer;
+        border: 3px solid green;
+        bottom: 22rem;
+        left: 8rem;
+        text-decoration: none;
+      }
+      .view-nudge:hover{
+        color: red;
+        padding: 25px;
+        transition: 0.4s ease-in;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h2>Create a Nudge</h2>
-        <form action="/api/v3/app/nudges" method="POST" enctype="multipart/form-data" id="nudgeForm">
-            <div class="form-group">
-                <label for="tag">Tag article or event:</label>
-                <input type="text" id="tag" name="tag" value="<%= typeof tag !== 'undefined' ? tag : '' %>">
-            </div>
+      <h2>Create a Nudge</h2>
+      <form
+        action="/api/v3/app/nudges"
+        method="POST"
+        enctype="multipart/form-data"
+        id="nudgeForm"
+      >
+        <div class="form-group">
+          <label for="tag">Tag article or event:</label>
+          <input
+            type="text"
+            id="tag"
+            name="tag"
+            value="<%= typeof tag !== 'undefined' ? tag : '' %>"
+          />
+        </div>
 
-            <div class="form-group">
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" placeholder="Title.... (60 char max)" value="<%= typeof title !== 'undefined' ? title : '' %>">
-            </div>
+        <div class="form-group">
+          <label for="title">Title:</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            placeholder="Title.... (60 char max)"
+            value="<%= typeof title !== 'undefined' ? title : '' %>"
+          />
+        </div>
 
+        <div class="form-group">
+          <label>Scheduled on:</label>
+          <input
+            type="text"
+            id="date"
+            name="date"
+            placeholder="dd/mm/yy"
+            value="<%= typeof date !== 'undefined' ? date : '' %>"
+          />
+        </div>
 
-            <div class="form-group">
-                <label>Scheduled on:</label>
-                <input type="text" id="date" name="date" placeholder="dd/mm/yy" value="<%= typeof date !== 'undefined' ? date : '' %>">
-            </div>
+        <div class="form-group">
+          <label>Timings:</label>
+          <input
+            type="text"
+            id="time"
+            name="time"
+            placeholder="From: hh:mm to hh:mm"
+            value="<%= typeof time !== 'undefined' ? time : '' %>"
+          />
+        </div>
 
-            <div class="form-group">
-                <label>Timings:</label>
-                <input type="text" id="time" name="time" placeholder="From: hh:mm to hh:mm" value="<%= typeof time !== 'undefined' ? time : '' %>">
-            </div>
+        <div class="form-group">
+          <label for="description">Description of the nudge:</label>
+          <textarea id="description" name="description" rows="4">
+<%= typeof description !== 'undefined' ? description : '' %></textarea
+          >
+        </div>
 
-            <div class="form-group">
-                <label for="description">Description of the nudge:</label>
-                <textarea id="description" name="description" rows="4"><%= typeof description !== 'undefined' ? description : '' %></textarea>
-            </div>
+        <div class="form-group">
+          <label for="icon"
+            >For Viewing a Nudge at the end of an article:</label
+          >
 
-            <div class="form-group">
-                <label for="icon">For Viewing a Nudge at the end of an article:</label>
+          <div class="form-group">
+            <label for="coverImage">Choose Image:</label>
+            <input type="file" id="coverImage" name="coverImage" />
+          </div>
 
-                <div class="form-group">
-                    <label for="coverImage">Choose Image:</label>
-                    <input type="file" id="coverImage" name="coverImage">
-                </div>
+          <input
+            type="text"
+            id="invitationText"
+            name="invitationText"
+            placeholder="Enter one line invitation..."
+            value="<%= typeof invitationText !== 'undefined' ? invitationText : '' %>"
+          />
+        </div>
 
-                <input type="text" id="invitationText" name="invitationText" placeholder="Enter one line invitation..." value="<%= typeof invitationText !== 'undefined' ? invitationText : '' %>">
-            </div>
-
-            <div class="form-group">
-                <button type="submit" class="btn-publish">Publish Now</button>
-            </div>
-        </form>
+        <div class="form-group">
+          <button type="submit" class="btn-publish">Publish Now</button>
+        </div>
+      </form>
     </div>
 
-<script>
-    document.getElementById('nudgeForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
+    <a href="#" class="view-nudge">view all Nudge</a>
 
-        const formData = new FormData(event.target);
+    <script>
+      document
+        .getElementById("nudgeForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
 
-        try {
-            const response = await fetch('/api/v3/app/nudges', {
-                method: 'POST',
-                body: formData
+          const formData = new FormData(event.target);
+
+          try {
+            const response = await fetch("/api/v3/app/nudges", {
+              method: "POST",
+              body: formData,
             });
 
             if (response.ok) {
-                const result = await response.json();
-                console.log('Success:', result);
-                alert('Nudge created successfully!');
+              const result = await response.json();
+              console.log("Success:", result);
+              alert("Nudge created successfully!");
             } else {
-                const error = await response.json();
-                console.error('Error:', error);
-                alert('Failed to create nudge.');
+              const error = await response.json();
+              console.error("Error:", error);
+              alert("Failed to create nudge.");
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error while submitting the form.');
-        }
-    });
-</script>
-
-
-</body>
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Error while submitting the form.");
+          }
+        });
+    </script>
+  </body>
 </html>
