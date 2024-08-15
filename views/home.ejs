@@ -67,7 +67,7 @@
 <body>
     <div class="container">
         <h2>Create a Nudge</h2>
-        <form action="/nudges/create" method="POST" enctype="multipart/form-data">
+        <form action="/api/v3/app/nudges" method="POST" enctype="multipart/form-data" id="nudgeForm">
             <div class="form-group">
                 <label for="tag">Tag article or event:</label>
                 <input type="text" id="tag" name="tag" value="<%= typeof tag !== 'undefined' ? tag : '' %>">
@@ -78,10 +78,6 @@
                 <input type="text" id="title" name="title" placeholder="Title.... (60 char max)" value="<%= typeof title !== 'undefined' ? title : '' %>">
             </div>
 
-            <div class="form-group">
-                <label for="coverImage">Choose Image:</label>
-                <input type="file" id="coverImage" name="coverImage">
-            </div>
 
             <div class="form-group">
                 <label>Scheduled on:</label>
@@ -100,15 +96,49 @@
 
             <div class="form-group">
                 <label for="icon">For Viewing a Nudge at the end of an article:</label>
-                <div class="icon-picker" id="icon"></div>
+
+                <div class="form-group">
+                    <label for="coverImage">Choose Image:</label>
+                    <input type="file" id="coverImage" name="coverImage">
+                </div>
+
                 <input type="text" id="invitationText" name="invitationText" placeholder="Enter one line invitation..." value="<%= typeof invitationText !== 'undefined' ? invitationText : '' %>">
             </div>
 
             <div class="form-group">
-                <button type="button" class="btn-preview">Preview</button>
                 <button type="submit" class="btn-publish">Publish Now</button>
             </div>
         </form>
     </div>
+
+<script>
+    document.getElementById('nudgeForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+
+        try {
+            const response = await fetch('/api/v3/app/nudges', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Success:', result);
+                alert('Nudge created successfully!');
+            } else {
+                const error = await response.json();
+                console.error('Error:', error);
+                alert('Failed to create nudge.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error while submitting the form.');
+        }
+    });
+</script>
+
+
 </body>
 </html>

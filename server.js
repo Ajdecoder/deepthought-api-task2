@@ -1,18 +1,42 @@
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
+const env = require("dotenv");
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
 
-const app = express();
-app.use(express.json());
-app.set('view engine', 'ejs')
+env.config();
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // MongoDB configuration
-const mongoUrl = "mongodb://localhost:27017";
+const mongoUrl = process.env.MONGO_URL;
 const dbName = "Eventsdb";
 const collectionName = "nudges";
 
-app.get('/', (req, res) => {
-    res.render('home')
-})
+// Configure multer storage to use Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "nudges", // folder in your Cloudinary account
+    format: async (req, file) => "png", // convert all images to png format
+  },
+});
+
+const upload = multer({ storage: storage });
+
+const app = express();
+app.use(express.json());
+app.set("view engine", "ejs");
+
+app.get("/", (req, res) => {
+  res.render("home");
+});
 
 async function connectToDatabase() {
   const client = new MongoClient(mongoUrl);
@@ -26,41 +50,31 @@ async function connectToDatabase() {
   }
 }
 
-app.post("/api/v3/app/nudges", async (req, res) => {
+app.post("/api/v3/app/nudges", upload.single("coverImage"), async (req, res) => {
   try {
     const db = await connectToDatabase();
 
+    // Cloudinary stores the image and provides a URL
+    const coverImageUrl = req.file.path;
+
     const nudge = {
-        tag: req.body.tag,
-        title: req.body.title,
-        coverImage: req.body.coverImage,
-        schedule: {
-          date: req.body.date,
-          time: {
-            start: req.body.startTime,
-            end: req.body.endTime
-          }
+      tag: req.body.tag,
+      title: req.body.title,
+      coverImage: coverImageUrl, // Store the Cloudinary URL in the database
+      schedule: {
+        date: req.body.date,
+        time: {
+          start: req.body.startTime,
+          end: req.body.endTime,
         },
-        description: req.body.description,
-        icon: req.body.icon,
-        invitationText: req.body.invitationText
-      
+      },
+      description: req.body.description,
+      icon: req.body.icon,
+      invitationText: req.body.invitationText,
     };
 
     const result = await db.collection(collectionName).insertOne(nudge);
     res.status(201).json({ id: result.insertedId });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// Get all nudges
-app.get("/api/v3/app/nudges", async (req, res) => {
-  try {
-    const db = await connectToDatabase();
-    const nudges = await db.collection(collectionName).find({}).toArray();
-    res.json(nudges);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
@@ -100,26 +114,25 @@ app.put("/api/v3/app/nudges/:id", async (req, res) => {
     }
 
     const updateData = {
-        $set: {
-          tag: req.body.tag,
-          title: req.body.title,
-          coverImage: req.body.coverImage,
-          schedule: {
-            date: req.body.date,
-            time: {
-              start: req.body.startTime,
-              end: req.body.endTime
-            }
-          },
-          description: req.body.description,
-          icon: req.body.icon,
-          invitationText: req.body.invitationText
-        }
-      };
+      $set: {
+        tag: req.body.tag,
+        title: req.body.title,
+        coverImage: req.body.coverImage,
+        schedule: {
+          date: req.body.date,
+          time: {
+            start: req.body.startTime,
+            end: req.body.endTime
+          }
+        },
+        description: req.body.description,
+        invitationText: req.body.invitationText
+      }
+    };
 
     const result = await db
       .collection(collectionName)
-      .updateOne({ _id: new ObjectId(nudgeId) }, { $set: updateData });
+      .updateOne({ _id: new ObjectId(nudgeId) }, updateData);
 
     if (result.modifiedCount === 1) {
       res.json({ message: "Nudge updated", nudge: updateData });
