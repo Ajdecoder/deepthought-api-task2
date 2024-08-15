@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Nudge</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group input[type="file"] {
+            padding: 3px;
+        }
+        .form-group .icon-picker {
+            display: inline-block;
+            width: auto;
+            padding: 8px;
+            margin-right: 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f7f7f7;
+        }
+        .form-group .icon-picker:after {
+            content: "Choose icon";
+        }
+        .form-group button {
+            width: 48%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-group .btn-preview {
+            background-color: #6c757d;
+            color: white;
+            margin-right: 4%;
+        }
+        .form-group .btn-publish {
+            background-color: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create a Nudge</h2>
+        <form action="/nudges/create" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="tag">Tag article or event:</label>
+                <input type="text" id="tag" name="tag" value="<%= typeof tag !== 'undefined' ? tag : '' %>">
+            </div>
+
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" placeholder="Title.... (60 char max)" value="<%= typeof title !== 'undefined' ? title : '' %>">
+            </div>
+
+            <div class="form-group">
+                <label for="coverImage">Choose Image:</label>
+                <input type="file" id="coverImage" name="coverImage">
+            </div>
+
+            <div class="form-group">
+                <label>Scheduled on:</label>
+                <input type="text" id="date" name="date" placeholder="dd/mm/yy" value="<%= typeof date !== 'undefined' ? date : '' %>">
+            </div>
+
+            <div class="form-group">
+                <label>Timings:</label>
+                <input type="text" id="time" name="time" placeholder="From: hh:mm to hh:mm" value="<%= typeof time !== 'undefined' ? time : '' %>">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description of the nudge:</label>
+                <textarea id="description" name="description" rows="4"><%= typeof description !== 'undefined' ? description : '' %></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="icon">For Viewing a Nudge at the end of an article:</label>
+                <div class="icon-picker" id="icon"></div>
+                <input type="text" id="invitationText" name="invitationText" placeholder="Enter one line invitation..." value="<%= typeof invitationText !== 'undefined' ? invitationText : '' %>">
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="btn-preview">Preview</button>
+                <button type="submit" class="btn-publish">Publish Now</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
