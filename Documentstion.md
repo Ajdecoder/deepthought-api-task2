@@ -1,6 +1,6 @@
 
 ## API Endpoints
-## BASE_URL: http://localhost:3000/
+## BASE_URL: http://localhost:3000/api/v3/app
 
 ### 1. Create a Nudge
 

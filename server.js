@@ -48,6 +48,7 @@ async function connectToDatabase() {
   }
 }
 
+
 // Serve the home page
 app.get("/", (req, res) => {
   res.render("home");
